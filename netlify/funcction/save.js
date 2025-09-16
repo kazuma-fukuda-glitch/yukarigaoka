@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 exports.handler = async function(event, context) {
   const headers = {
-    "Access-Control-Allow-Origin": "https://yukarigaoka.netlify.app", // 開発中は "*"、本番は自分のドメインに変更
+    "Access-Control-Allow-Origin": "https://yukarigaoka1.netlify.app/", // 開発中は "*"、本番は自分のドメインに変更
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
   };
