@@ -11,8 +11,8 @@
     <button type="submit">確認</button>
   </form>
 
-  <h2>画像表示</h2>
-  <div id="photos"></div> <!-- ここに画像を表示 -->
+  <h2>画像・PDF表示</h2>
+  <div id="files"></div>
 
   <script>
     // -----------------------------
@@ -20,7 +20,6 @@
     // -----------------------------
     document.getElementById("myForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const name = document.getElementById("name").value;
       if (!name) return;
 
@@ -44,29 +43,37 @@
     });
 
     // -----------------------------
-    // 画像表示
+    // 画像表示（レコード1の1枚だけ）
     // -----------------------------
-    async function loadImages(recordId) {
-      const resp = await fetch(`https://yukarigaoka1.netlify.app/.netlify/functions/getImage?recordId=${recordId}`);
-      const { fileKeys } = await resp.json();
+    async function loadImage() {
+      try {
+        const resp = await fetch("https://yukarigaoka1.netlify.app/.netlify/functions/getImage?recordId=1");
+        const data = await resp.json();
 
-      const container = document.getElementById("photos");
-      container.innerHTML = "";
+        const container = document.getElementById("files");
+        container.innerHTML = "";
 
-      for (const key of fileKeys) {
-        const fileResp = await fetch(`https://yukarigaoka1.netlify.app/.netlify/functions/getFile?fileKey=${key}`);
+        if (!data.fileKeys || !data.fileKeys.length) {
+          container.textContent = "画像が見つかりませんでした。";
+          return;
+        }
+
+        const fileKey = data.fileKeys[0];
+        const fileResp = await fetch(`https://yukarigaoka1.netlify.app/.netlify/functions/getFile?fileKey=${fileKey}`);
         const base64 = await fileResp.text();
 
         const img = document.createElement("img");
-        img.src = `data:image/png;base64,${base64}`;
-        img.style.maxWidth = "200px"; // 表示サイズ調整
-        img.style.margin = "5px";
+        img.src = `data:image/jpeg;base64,${base64}`; // jpeg または png に合わせる
+        img.style.maxWidth = "200px";
         container.appendChild(img);
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("files").textContent = "画像取得エラー";
       }
     }
 
-    // 表示したいレコードIDを指定
-   loadImages(1);
+    loadImage();
   </script>
 </body>
 </html>
